@@ -6,9 +6,7 @@ import subprocess
 
 from path import path
 
-FULL_SIZE = 1024
-THUMB_SIZE = 120
-QUALITY = 75
+import config
 
 gDryRun = False
 
@@ -24,7 +22,7 @@ def resizeImage(src, size, dst):
         dst.dirname().makedirs()
     subprocess.call(["convert",
         "-resize", "%dx%d" % (size, size),
-        "-quality", str(QUALITY),
+        "-quality", str(config.QUALITY),
         src, dst])
 
 
@@ -43,17 +41,20 @@ def generateThumbnail(src, dstDir):
         return
 
     if not gDryRun:
-        tempImage = createTempImage(src)
+        tempImage = path(createTempImage(src))
 
-    if updateFull:
-        print "Updating full image", src
-        if not gDryRun:
-            resizeImage(tempImage, FULL_SIZE, full)
+    try:
+        if updateFull:
+            print "Updating full image", src
+            if not gDryRun:
+                resizeImage(tempImage, config.FULL_SIZE, full)
 
-    if updateThumb:
-        print "Updating thumbnail", src
-        if not gDryRun:
-            resizeImage(tempImage, THUMB_SIZE, thumb)
+        if updateThumb:
+            print "Updating thumbnail", src
+            if not gDryRun:
+                resizeImage(tempImage, config.THUMB_SIZE, thumb)
+    finally:
+        tempImage.unlink()
 
 
 def main():
