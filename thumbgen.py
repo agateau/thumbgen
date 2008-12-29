@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os
 import sys
 import tempfile
 from optparse import OptionParser
@@ -10,11 +11,9 @@ import config
 
 gDryRun = False
 
-def createTempImage(src):
-    fs, name = tempfile.mkstemp()
+def createTempImage(src, name):
     src.copy(name)
     subprocess.call(["jhead", "-autorot", name])
-    return name
 
 
 def resizeImage(src, size, dst):
@@ -40,8 +39,10 @@ def generateThumbnail(src, dstDir):
     if not updateThumb and not updateFull:
         return
 
+    fd, tempImage = tempfile.mkstemp()
+    tempImage = path(tempImage)
     if not gDryRun:
-        tempImage = path(createTempImage(src))
+        createTempImage(src, tempImage)
 
     try:
         if updateFull:
@@ -54,6 +55,7 @@ def generateThumbnail(src, dstDir):
             if not gDryRun:
                 resizeImage(tempImage, config.THUMB_SIZE, thumb)
     finally:
+        os.close(fd)
         tempImage.unlink()
 
 
