@@ -53,7 +53,7 @@ def generateThumbnail(src, dstDir):
         if updateThumb:
             print "Updating thumbnail", src
             if not gDryRun:
-                resizeImage(tempImage, config.THUMB_SIZE, thumb)
+                resizeImage(full, config.THUMB_SIZE, thumb)
     finally:
         os.close(fd)
         tempImage.unlink()
